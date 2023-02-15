@@ -1,0 +1,124 @@
+---
+source: tests/test.rs
+expression: parser.parse(&buffer).unwrap()
+---
+SynthProblem {
+    imports: [],
+    decls: [
+        TypeDecl(
+            "nat",
+            Type(
+                Variant([("O", Type(Tuple([]))), ("S", Type(Named("nat")))]),
+            ),
+        ),
+        TypeDecl(
+            "tree",
+            Type(
+                Variant([("Leaf", Type(Tuple([]))), ("Node", Type(Tuple([Type(Named("nat")), Type(Named("tree")), Type(Named("tree"))])))]),
+            ),
+        ),
+        TypeDecl(
+            "bool",
+            Type(
+                Variant([("True", Type(Tuple([]))), ("False", Type(Tuple([])))]),
+            ),
+        ),
+        TypeDecl(
+            "cmp",
+            Type(
+                Variant([("LT", Type(Tuple([]))), ("EQ", Type(Tuple([]))), ("GT", Type(Tuple([])))]),
+            ),
+        ),
+        ExpDecl(
+            "compare",
+            Exp(
+                Fix("compare", Type(Arrow(Type(Arrow(Type(Named("nat")), Type(Named("nat")))), Type(Named("cmp")))), Exp(Func(Param { name: "x1", ty: Type(Named("nat")) }, Exp(Func(Param { name: "x2", ty: Type(Named("nat")) }, Exp(Match(Exp(Var("x1")), [(Ctor("O", Wildcard), Exp(Match(Exp(Var("x2")), [(Ctor("O", Wildcard), Exp(CTor("EQ", Exp(Tuple([]))))), (Ctor("S", Wildcard), Exp(CTor("LT", Exp(Tuple([])))))]))), (Ctor("S", Var("x1")), Exp(Match(Exp(Var("x2")), [(Ctor("O", Wildcard), Exp(CTor("GT", Exp(Tuple([]))))), (Ctor("S", Var("x2")), Exp(App(Exp(App(Exp(Var("compare")), Exp(Var("x1")))), Exp(Var("x2")))))])))]))))))),
+            ),
+        ),
+        ExpDecl(
+            "max",
+            Exp(
+                Fix("max", Type(Arrow(Type(Arrow(Type(Named("nat")), Type(Named("nat")))), Type(Named("nat")))), Exp(Func(Param { name: "x", ty: Type(Named("nat")) }, Exp(Func(Param { name: "y", ty: Type(Named("nat")) }, Exp(Match(Exp(App(Exp(App(Exp(Var("compare")), Exp(Var("x")))), Exp(Var("y")))), [(Ctor("LT", Wildcard), Exp(Var("x"))), (Ctor("EQ", Wildcard), Exp(Var("x"))), (Ctor("GT", Wildcard), Exp(Var("y")))]))))))),
+            ),
+        ),
+        ExpDecl(
+            "height",
+            Exp(
+                Fix("height", Type(Arrow(Type(Named("tree")), Type(Named("nat")))), Exp(Func(Param { name: "x", ty: Type(Named("tree")) }, Exp(Match(Exp(Var("x")), [(Ctor("Leaf", Wildcard), Exp(CTor("O", Exp(Tuple([]))))), (Ctor("Node", Var("y")), Exp(Match(Exp(Proj(1, Exp(Var("y")))), [(Ctor("Leaf", Wildcard), Exp(CTor("S", Exp(Tuple([Exp(App(Exp(Var("height")), Exp(Proj(2, Exp(Var("y"))))))]))))), (Ctor("Node", Var("z")), Exp(Match(Exp(Proj(2, Exp(Var("y")))), [(Ctor("Leaf", Wildcard), Exp(CTor("S", Exp(Tuple([Exp(App(Exp(Var("height")), Exp(Proj(1, Exp(Var("y"))))))]))))), (Ctor("Node", Var("w")), Exp(CTor("S", Exp(Tuple([Exp(App(Exp(App(Exp(Var("max")), Exp(App(Exp(Var("height")), Exp(Proj(1, Exp(Var("y")))))))), Exp(App(Exp(Var("height")), Exp(Proj(2, Exp(Var("y"))))))))])))))])))])))]))))),
+            ),
+        ),
+        ExpDecl(
+            "band",
+            Exp(
+                Fix("band", Type(Arrow(Type(Arrow(Type(Named("bool")), Type(Named("bool")))), Type(Named("bool")))), Exp(Func(Param { name: "x", ty: Type(Named("bool")) }, Exp(Func(Param { name: "y", ty: Type(Named("bool")) }, Exp(Match(Exp(Var("x")), [(Ctor("False", Wildcard), Exp(Var("x"))), (Ctor("True", Wildcard), Exp(Var("y")))]))))))),
+            ),
+        ),
+    ],
+    synth_type: Type(
+        Arrow(Type(Named("tree")), Type(Named("bool"))),
+    ),
+    spec: UIOEs(
+        [
+            Example {
+                input: [
+                    Exp(
+                        CTor("Leaf", Exp(Tuple([]))),
+                    ),
+                ],
+                output: Exp(
+                    CTor("True", Exp(Tuple([]))),
+                ),
+            },
+            Example {
+                input: [
+                    Exp(
+                        CTor("Node", Exp(Tuple([Exp(CTor("O", Exp(Tuple([])))), Exp(CTor("Leaf", Exp(Tuple([])))), Exp(CTor("Leaf", Exp(Tuple([]))))]))),
+                    ),
+                ],
+                output: Exp(
+                    CTor("True", Exp(Tuple([]))),
+                ),
+            },
+            Example {
+                input: [
+                    Exp(
+                        CTor("Node", Exp(Tuple([Exp(CTor("O", Exp(Tuple([])))), Exp(CTor("Node", Exp(Tuple([Exp(CTor("S", Exp(CTor("O", Exp(Tuple([])))))), Exp(CTor("Leaf", Exp(Tuple([])))), Exp(CTor("Leaf", Exp(Tuple([]))))])))), Exp(CTor("Leaf", Exp(Tuple([]))))]))),
+                    ),
+                ],
+                output: Exp(
+                    CTor("True", Exp(Tuple([]))),
+                ),
+            },
+            Example {
+                input: [
+                    Exp(
+                        CTor("Node", Exp(Tuple([Exp(CTor("O", Exp(Tuple([])))), Exp(CTor("Node", Exp(Tuple([Exp(CTor("S", Exp(CTor("O", Exp(Tuple([])))))), Exp(CTor("Node", Exp(Tuple([Exp(CTor("S", Exp(CTor("O", Exp(Tuple([])))))), Exp(CTor("Leaf", Exp(Tuple([])))), Exp(CTor("Leaf", Exp(Tuple([]))))])))), Exp(CTor("Leaf", Exp(Tuple([]))))])))), Exp(CTor("Leaf", Exp(Tuple([]))))]))),
+                    ),
+                ],
+                output: Exp(
+                    CTor("False", Exp(Tuple([]))),
+                ),
+            },
+            Example {
+                input: [
+                    Exp(
+                        CTor("Node", Exp(Tuple([Exp(CTor("O", Exp(Tuple([])))), Exp(CTor("Node", Exp(Tuple([Exp(CTor("S", Exp(CTor("O", Exp(Tuple([])))))), Exp(CTor("Node", Exp(Tuple([Exp(CTor("S", Exp(CTor("O", Exp(Tuple([])))))), Exp(CTor("Leaf", Exp(Tuple([])))), Exp(CTor("Leaf", Exp(Tuple([]))))])))), Exp(CTor("Node", Exp(Tuple([Exp(CTor("S", Exp(CTor("O", Exp(Tuple([])))))), Exp(CTor("Leaf", Exp(Tuple([])))), Exp(CTor("Leaf", Exp(Tuple([]))))]))))])))), Exp(CTor("Node", Exp(Tuple([Exp(CTor("S", Exp(CTor("O", Exp(Tuple([])))))), Exp(CTor("Leaf", Exp(Tuple([])))), Exp(CTor("Leaf", Exp(Tuple([]))))]))))]))),
+                    ),
+                ],
+                output: Exp(
+                    CTor("True", Exp(Tuple([]))),
+                ),
+            },
+            Example {
+                input: [
+                    Exp(
+                        CTor("Node", Exp(Tuple([Exp(CTor("O", Exp(Tuple([])))), Exp(CTor("Node", Exp(Tuple([Exp(CTor("S", Exp(CTor("O", Exp(Tuple([])))))), Exp(CTor("Node", Exp(Tuple([Exp(CTor("S", Exp(CTor("O", Exp(Tuple([])))))), Exp(CTor("Leaf", Exp(Tuple([])))), Exp(CTor("Leaf", Exp(Tuple([]))))])))), Exp(CTor("Node", Exp(Tuple([Exp(CTor("S", Exp(CTor("O", Exp(Tuple([])))))), Exp(CTor("Leaf", Exp(Tuple([])))), Exp(CTor("Node", Exp(Tuple([Exp(CTor("S", Exp(CTor("O", Exp(Tuple([])))))), Exp(CTor("Leaf", Exp(Tuple([])))), Exp(CTor("Leaf", Exp(Tuple([]))))]))))]))))])))), Exp(CTor("Node", Exp(Tuple([Exp(CTor("S", Exp(CTor("O", Exp(Tuple([])))))), Exp(CTor("Leaf", Exp(Tuple([])))), Exp(CTor("Leaf", Exp(Tuple([]))))]))))]))),
+                    ),
+                ],
+                output: Exp(
+                    CTor("False", Exp(Tuple([]))),
+                ),
+            },
+        ],
+    ),
+}

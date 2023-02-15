@@ -1,0 +1,61 @@
+---
+source: tests/test.rs
+expression: parser.parse(&buffer).unwrap()
+---
+SynthProblem {
+    imports: [],
+    decls: [
+        TypeDecl(
+            "bool",
+            Type(
+                Variant([("False", Type(Tuple([]))), ("True", Type(Tuple([])))]),
+            ),
+        ),
+    ],
+    synth_type: Type(
+        Arrow(Type(Arrow(Type(Named("bool")), Type(Named("bool")))), Type(Named("bool"))),
+    ),
+    spec: UIOEs(
+        [
+            Example {
+                input: [
+                    Exp(
+                        CTor("True", Exp(Tuple([]))),
+                    ),
+                    Exp(
+                        CTor("False", Exp(Tuple([]))),
+                    ),
+                ],
+                output: Exp(
+                    CTor("True", Exp(Tuple([]))),
+                ),
+            },
+            Example {
+                input: [
+                    Exp(
+                        CTor("False", Exp(Tuple([]))),
+                    ),
+                    Exp(
+                        CTor("True", Exp(Tuple([]))),
+                    ),
+                ],
+                output: Exp(
+                    CTor("True", Exp(Tuple([]))),
+                ),
+            },
+            Example {
+                input: [
+                    Exp(
+                        CTor("False", Exp(Tuple([]))),
+                    ),
+                    Exp(
+                        CTor("False", Exp(Tuple([]))),
+                    ),
+                ],
+                output: Exp(
+                    CTor("False", Exp(Tuple([]))),
+                ),
+            },
+        ],
+    ),
+}

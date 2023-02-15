@@ -1,0 +1,146 @@
+use crate::lang::{Pattern, Param, Declaration, Example, Type, Exp, Problem, SynthProblem};
+
+grammar;
+
+match {
+    r"[[:upper:]][[:word:]]*" => UID,
+    r"[[:lower:]][[:word:]]*" => LID,
+    r"[[:digit:]]+" => INT,
+    r##"("[^"]*")"## => STR,
+    "fun" => FUN,
+    "match" => MATCH,
+    "with" => WITH,
+    "type" => TYPE,
+    "of" => OF,
+    "equiv" => EQUIV,
+    "let" => LET,
+    "satisfying" => SATISFYING,
+    "include" => INCLUDE,
+    "synth" => SYNTH,
+    "unit" => UNIT,
+    "val" => VAL,
+    "binding" => BINDING,
+    "mu" => MU,
+    "fix" => FIX,
+} else {
+    r"[[:space:]]*" => { }, /// Whitespace
+    r"\(\*[^\*]*\*\)" => { }, /// Comments
+    _
+}
+
+pub Problem : SynthProblem = {
+    <ids:imports_decls> SYNTH <st:typ> SATISFYING <s:spec> => SynthProblem {
+        imports: ids.0,
+        decls: ids.1,
+        synth_type: st,
+        spec: s,
+    }
+}
+
+imports_decls : (Vec<String>, Vec<Declaration>) = {
+    <i: (INCLUDE <STR>)*> <ds: (decl)*> => (i.iter().map(ToString::to_string).collect(), ds)
+}
+
+decl : Declaration = {
+    TYPE <l:LID> "=" <t:typ> => Declaration::TypeDecl(l.to_string(), t),
+    LET <l:LID> "=" <e:Exp> ";;" => Declaration::ExpDecl(l.to_string(), e),
+
+}
+
+typ : Type = {
+    #[precedence(level="1")] #[assoc(side="left")]
+    <t1:typ> "->" <t2:typ> => Type::Arrow(t1, t2),
+    #[precedence(level="0")]
+    <v:NonEmptyList<"*", base_typ>> => if v.len() > 1 {Type::Tuple(v)} else {v.get(0).unwrap().clone()},
+    <i:(<typ_variant>)+> => Type::Variant(i),
+}
+
+typ_variant : (String, Type) = {
+    "|" <l:UID> OF <t:NonEmptyList<"*", base_typ>> => (l.to_string(), if t.len() == 1 {t[0].clone()} else {Type::Tuple(t)}),
+    "|" <l:UID> => (l.to_string(), Type::Tuple(Vec::new()))
+}
+
+base_typ : Type = {
+    <l:LID> => Type::Named(l.to_string()),
+    "(" <t:typ> ")" => t,
+    "()" => Type::Tuple(Vec::new()),
+}
+
+spec : Problem = {
+    <es:List<",", example>> => Problem::UIOEs(es),
+    <es:List<",", example>> "equiv" <e:Exp> => Problem::UEquiv(es, e),
+    <e:Exp> => Problem::UPost(e),
+
+}
+
+example : Example = {
+   "["  <es:List<",", Exp>> "]" "->" <e:Exp> => Example {input:es, output:e}
+}
+
+Branch : (Pattern, Exp) = {
+    "|" <p:Pattern> "->" <e: InnerExp> => (p, e)
+}
+
+arg : (String, Type) = {
+    "(" <x: LID> ":" <t:typ> ")" => (x.to_string(), t)
+}
+
+Exp : Exp = {
+    <e:InnerExp> => e,
+    FIX <a:arg> "=" <e:Exp> => Exp::Fix(a.0, a.1, e),
+    FUN <a:arg> "->" <e:Exp> => Exp::Func(Param {name: a.0, ty:a.1}, e),
+    MATCH <e:Exp> WITH <b:(Branch)+> => Exp::Match(e, b),
+}
+
+InnerExp : Exp = {
+    #[precedence(level="0")]
+    <i:INT> => i.parse::<u64>().unwrap().into(),
+    <c:UID> => Exp::mk_unctor_or_ctor_by_name(c, Exp::Unit()),
+    <c1:UID> <c2:UID> => Exp::mk_unctor_or_ctor_by_name(c1, Exp::mk_unctor_or_ctor_by_name(c2, Exp::Unit())),
+    <c1:UID> <x:LID> => Exp::mk_unctor_or_ctor_by_name(c1, Exp::Var(x.to_string())),
+    <c:UID> "(" <e:List<",", Exp>> ")" => Exp::mk_unctor_or_ctor_by_name(c, Exp::Tuple(e)),
+
+    <e:LID> <e_args:(InnerExpArg)*> => e_args.into_iter().fold(Exp::Var(e.to_string()), |acc, e| Exp::App(acc, e)),
+
+    <e:InnerExp> "." <i:INT> => Exp::Proj(i.parse().unwrap(), e),
+    "(" <e:NonEmptyList<",", Exp>> ")" => if e.len() == 1 {e[0].clone()} else {Exp::Tuple(e)},
+    "()" => Exp::Unit(),
+
+
+    #[precedence(level="2")]
+    #[assoc(side="left")]
+    <e1:InnerExp> "==" <e2:InnerExp> => Exp::Eq(true, e1, e2),
+    #[precedence(level="2")]
+    #[assoc(side="left")]
+    <e1:InnerExp> "!=" <e2:InnerExp> => Exp::Eq(false, e1, e2),
+}
+
+InnerExpArg : Exp = {
+    <e:LID> => Exp::Var(e.to_string()),
+    "(" <e:InnerExp> ")" => e,
+}
+
+Pattern : Pattern = {
+    <u:UID> => Pattern::Ctor(u.to_string(), Box::new(Pattern::Wildcard)),
+    <u:UID> <p:Pattern> => Pattern::Ctor(u.to_string(), Box::new(p)),
+    "_" => Pattern::Wildcard,
+    "(" <p:List<",", Pattern>> ")" => Pattern::Tuple(p),
+    <l:LID> => Pattern::Var(l.to_string()),
+}
+
+NonEmptyList<SEP, T>: Vec<T> = { // (1)
+    <mut v:(<T> SEP)*> <e:T> => {
+            v.push(e);
+            v
+    }
+}
+
+List<SEP, T>: Vec<T> = { // (1)
+    <mut v:(<T> SEP)*> <e:T?> => match e { // (2)
+        None => v,
+        Some(e) => {
+            v.push(e);
+            v
+        }
+    }
+}

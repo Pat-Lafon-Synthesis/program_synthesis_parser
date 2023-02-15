@@ -1,0 +1,58 @@
+---
+source: tests/test.rs
+expression: parser.parse(&buffer).unwrap()
+---
+SynthProblem {
+    imports: [],
+    decls: [
+        TypeDecl(
+            "nat",
+            Type(
+                Variant([("O", Type(Tuple([]))), ("S", Type(Named("nat")))]),
+            ),
+        ),
+        TypeDecl(
+            "list",
+            Type(
+                Variant([("Nil", Type(Tuple([]))), ("Cons", Type(Tuple([Type(Named("nat")), Type(Named("list"))])))]),
+            ),
+        ),
+    ],
+    synth_type: Type(
+        Arrow(Type(Named("list")), Type(Named("nat"))),
+    ),
+    spec: UIOEs(
+        [
+            Example {
+                input: [
+                    Exp(
+                        CTor("Nil", Exp(Tuple([]))),
+                    ),
+                ],
+                output: Exp(
+                    CTor("O", Exp(Tuple([]))),
+                ),
+            },
+            Example {
+                input: [
+                    Exp(
+                        CTor("Cons", Exp(Tuple([Exp(CTor("O", Exp(Tuple([])))), Exp(CTor("Nil", Exp(Tuple([]))))]))),
+                    ),
+                ],
+                output: Exp(
+                    CTor("S", Exp(CTor("O", Exp(Tuple([]))))),
+                ),
+            },
+            Example {
+                input: [
+                    Exp(
+                        CTor("Cons", Exp(Tuple([Exp(CTor("O", Exp(Tuple([])))), Exp(CTor("Cons", Exp(Tuple([Exp(CTor("O", Exp(Tuple([])))), Exp(CTor("Nil", Exp(Tuple([]))))]))))]))),
+                    ),
+                ],
+                output: Exp(
+                    CTor("S", Exp(CTor("S", Exp(CTor("O", Exp(Tuple([]))))))),
+                ),
+            },
+        ],
+    ),
+}

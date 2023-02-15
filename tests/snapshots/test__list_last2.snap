@@ -1,0 +1,94 @@
+---
+source: tests/test.rs
+expression: parser.parse(&buffer).unwrap()
+---
+SynthProblem {
+    imports: [],
+    decls: [
+        TypeDecl(
+            "nat",
+            Type(
+                Variant([("O", Type(Tuple([]))), ("S", Type(Named("nat")))]),
+            ),
+        ),
+        TypeDecl(
+            "list",
+            Type(
+                Variant([("Nil", Type(Tuple([]))), ("Cons", Type(Tuple([Type(Named("nat")), Type(Named("list"))])))]),
+            ),
+        ),
+        TypeDecl(
+            "natopt",
+            Type(
+                Variant([("None", Type(Tuple([]))), ("Some", Type(Tuple([Type(Named("nat")), Type(Named("nat"))])))]),
+            ),
+        ),
+    ],
+    synth_type: Type(
+        Arrow(Type(Named("list")), Type(Named("natopt"))),
+    ),
+    spec: UIOEs(
+        [
+            Example {
+                input: [
+                    Exp(
+                        CTor("Nil", Exp(Tuple([]))),
+                    ),
+                ],
+                output: Exp(
+                    CTor("None", Exp(Tuple([]))),
+                ),
+            },
+            Example {
+                input: [
+                    Exp(
+                        CTor("Cons", Exp(Tuple([Exp(CTor("S", Exp(CTor("O", Exp(Tuple([])))))), Exp(CTor("Nil", Exp(Tuple([]))))]))),
+                    ),
+                ],
+                output: Exp(
+                    CTor("None", Exp(Tuple([]))),
+                ),
+            },
+            Example {
+                input: [
+                    Exp(
+                        CTor("Cons", Exp(Tuple([Exp(CTor("S", Exp(CTor("S", Exp(CTor("O", Exp(Tuple([])))))))), Exp(CTor("Cons", Exp(Tuple([Exp(CTor("S", Exp(CTor("O", Exp(Tuple([])))))), Exp(CTor("Nil", Exp(Tuple([]))))]))))]))),
+                    ),
+                ],
+                output: Exp(
+                    CTor("Some", Exp(Tuple([Exp(CTor("S", Exp(CTor("S", Exp(CTor("O", Exp(Tuple([])))))))), Exp(CTor("S", Exp(CTor("O", Exp(Tuple([]))))))]))),
+                ),
+            },
+            Example {
+                input: [
+                    Exp(
+                        CTor("Cons", Exp(Tuple([Exp(CTor("S", Exp(CTor("O", Exp(Tuple([])))))), Exp(CTor("Cons", Exp(Tuple([Exp(CTor("S", Exp(CTor("S", Exp(CTor("O", Exp(Tuple([])))))))), Exp(CTor("Nil", Exp(Tuple([]))))]))))]))),
+                    ),
+                ],
+                output: Exp(
+                    CTor("Some", Exp(Tuple([Exp(CTor("S", Exp(CTor("O", Exp(Tuple([])))))), Exp(CTor("S", Exp(CTor("S", Exp(CTor("O", Exp(Tuple([]))))))))]))),
+                ),
+            },
+            Example {
+                input: [
+                    Exp(
+                        CTor("Cons", Exp(Tuple([Exp(CTor("S", Exp(CTor("S", Exp(CTor("S", Exp(CTor("O", Exp(Tuple([])))))))))), Exp(CTor("Cons", Exp(Tuple([Exp(CTor("S", Exp(CTor("S", Exp(CTor("O", Exp(Tuple([])))))))), Exp(CTor("Cons", Exp(Tuple([Exp(CTor("S", Exp(CTor("O", Exp(Tuple([])))))), Exp(CTor("Nil", Exp(Tuple([]))))]))))]))))]))),
+                    ),
+                ],
+                output: Exp(
+                    CTor("Some", Exp(Tuple([Exp(CTor("S", Exp(CTor("S", Exp(CTor("O", Exp(Tuple([])))))))), Exp(CTor("S", Exp(CTor("O", Exp(Tuple([]))))))]))),
+                ),
+            },
+            Example {
+                input: [
+                    Exp(
+                        CTor("Cons", Exp(Tuple([Exp(CTor("S", Exp(CTor("S", Exp(CTor("S", Exp(CTor("S", Exp(CTor("O", Exp(Tuple([])))))))))))), Exp(CTor("Cons", Exp(Tuple([Exp(CTor("S", Exp(CTor("O", Exp(Tuple([])))))), Exp(CTor("Cons", Exp(Tuple([Exp(CTor("S", Exp(CTor("S", Exp(CTor("S", Exp(CTor("O", Exp(Tuple([])))))))))), Exp(CTor("Nil", Exp(Tuple([]))))]))))]))))]))),
+                    ),
+                ],
+                output: Exp(
+                    CTor("Some", Exp(Tuple([Exp(CTor("S", Exp(CTor("O", Exp(Tuple([])))))), Exp(CTor("S", Exp(CTor("S", Exp(CTor("S", Exp(CTor("O", Exp(Tuple([]))))))))))]))),
+                ),
+            },
+        ],
+    ),
+}

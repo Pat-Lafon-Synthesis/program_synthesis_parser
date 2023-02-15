@@ -1,0 +1,100 @@
+---
+source: tests/test.rs
+expression: parser.parse(&buffer).unwrap()
+---
+SynthProblem {
+    imports: [],
+    decls: [
+        TypeDecl(
+            "nat",
+            Type(
+                Variant([("O", Type(Tuple([]))), ("S", Type(Named("nat")))]),
+            ),
+        ),
+        TypeDecl(
+            "list",
+            Type(
+                Variant([("Nil", Type(Tuple([]))), ("Cons", Type(Tuple([Type(Named("nat")), Type(Named("list"))])))]),
+            ),
+        ),
+        TypeDecl(
+            "bool",
+            Type(
+                Variant([("True", Type(Tuple([]))), ("False", Type(Tuple([])))]),
+            ),
+        ),
+        ExpDecl(
+            "sum",
+            Exp(
+                Fix("sum", Type(Arrow(Type(Arrow(Type(Named("nat")), Type(Named("nat")))), Type(Named("nat")))), Exp(Func(Param { name: "n1", ty: Type(Named("nat")) }, Exp(Func(Param { name: "n2", ty: Type(Named("nat")) }, Exp(Match(Exp(Var("n1")), [(Ctor("O", Wildcard), Exp(Var("n2"))), (Ctor("S", Var("n1p")), Exp(CTor("S", Exp(Tuple([Exp(App(Exp(App(Exp(Var("sum")), Exp(Var("n1p")))), Exp(Var("n2"))))])))))]))))))),
+            ),
+        ),
+        ExpDecl(
+            "is_odd",
+            Exp(
+                Fix("is_odd", Type(Arrow(Type(Named("nat")), Type(Named("bool")))), Exp(Func(Param { name: "x1", ty: Type(Named("nat")) }, Exp(Match(Exp(Var("x1")), [(Ctor("O", Wildcard), Exp(CTor("False", Exp(Tuple([]))))), (Ctor("S", Var("x1p")), Exp(Match(Exp(Var("x1p")), [(Ctor("O", Wildcard), Exp(CTor("True", Exp(Tuple([]))))), (Ctor("S", Var("x1pp")), Exp(App(Exp(Var("is_odd")), Exp(Var("x1pp")))))])))]))))),
+            ),
+        ),
+        ExpDecl(
+            "count_odd",
+            Exp(
+                Func(Param { name: "n1", ty: Type(Named("nat")) }, Exp(Func(Param { name: "n2", ty: Type(Named("nat")) }, Exp(Match(Exp(App(Exp(Var("is_odd")), Exp(Var("n2")))), [(Ctor("True", Wildcard), Exp(CTor("S", Exp(Var("n1"))))), (Ctor("False", Wildcard), Exp(Var("n1")))]))))),
+            ),
+        ),
+    ],
+    synth_type: Type(
+        Arrow(Type(Arrow(Type(Arrow(Type(Arrow(Type(Arrow(Type(Named("nat")), Type(Named("nat")))), Type(Named("nat")))), Type(Named("nat")))), Type(Named("list")))), Type(Named("nat"))),
+    ),
+    spec: UIOEs(
+        [
+            Example {
+                input: [
+                    Exp(
+                        Var("sum"),
+                    ),
+                    Exp(
+                        CTor("O", Exp(Tuple([]))),
+                    ),
+                    Exp(
+                        CTor("Nil", Exp(Tuple([]))),
+                    ),
+                ],
+                output: Exp(
+                    CTor("O", Exp(Tuple([]))),
+                ),
+            },
+            Example {
+                input: [
+                    Exp(
+                        Var("sum"),
+                    ),
+                    Exp(
+                        CTor("O", Exp(Tuple([]))),
+                    ),
+                    Exp(
+                        CTor("Cons", Exp(Tuple([Exp(CTor("S", Exp(CTor("S", Exp(CTor("O", Exp(Tuple([])))))))), Exp(CTor("Cons", Exp(Tuple([Exp(CTor("S", Exp(CTor("O", Exp(Tuple([])))))), Exp(CTor("Nil", Exp(Tuple([]))))]))))]))),
+                    ),
+                ],
+                output: Exp(
+                    CTor("S", Exp(CTor("S", Exp(CTor("S", Exp(CTor("O", Exp(Tuple([]))))))))),
+                ),
+            },
+            Example {
+                input: [
+                    Exp(
+                        Var("sum"),
+                    ),
+                    Exp(
+                        CTor("O", Exp(Tuple([]))),
+                    ),
+                    Exp(
+                        CTor("Cons", Exp(Tuple([Exp(CTor("S", Exp(CTor("S", Exp(CTor("S", Exp(CTor("O", Exp(Tuple([])))))))))), Exp(CTor("Cons", Exp(Tuple([Exp(CTor("S", Exp(CTor("S", Exp(CTor("O", Exp(Tuple([])))))))), Exp(CTor("Cons", Exp(Tuple([Exp(CTor("S", Exp(CTor("O", Exp(Tuple([])))))), Exp(CTor("Nil", Exp(Tuple([]))))]))))]))))]))),
+                    ),
+                ],
+                output: Exp(
+                    CTor("S", Exp(CTor("S", Exp(CTor("S", Exp(CTor("S", Exp(CTor("S", Exp(CTor("S", Exp(CTor("O", Exp(Tuple([]))))))))))))))),
+                ),
+            },
+        ],
+    ),
+}

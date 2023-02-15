@@ -1,0 +1,98 @@
+---
+source: tests/test.rs
+expression: parser.parse(&buffer).unwrap()
+---
+SynthProblem {
+    imports: [],
+    decls: [
+        TypeDecl(
+            "nat",
+            Type(
+                Variant([("O", Type(Tuple([]))), ("S", Type(Named("nat")))]),
+            ),
+        ),
+        TypeDecl(
+            "list",
+            Type(
+                Variant([("Nil", Type(Tuple([]))), ("Cons", Type(Tuple([Type(Named("nat")), Type(Named("list"))])))]),
+            ),
+        ),
+        TypeDecl(
+            "tree",
+            Type(
+                Variant([("Leaf", Type(Tuple([]))), ("Node", Type(Tuple([Type(Named("tree")), Type(Named("nat")), Type(Named("tree"))])))]),
+            ),
+        ),
+        ExpDecl(
+            "div2",
+            Exp(
+                Fix("div2", Type(Arrow(Type(Named("nat")), Type(Named("nat")))), Exp(Func(Param { name: "n", ty: Type(Named("nat")) }, Exp(Match(Exp(Var("n")), [(Ctor("O", Wildcard), Exp(CTor("O", Exp(Tuple([]))))), (Ctor("S", Var("np")), Exp(Match(Exp(Var("np")), [(Ctor("O", Wildcard), Exp(CTor("O", Exp(Tuple([]))))), (Ctor("S", Var("npp")), Exp(CTor("S", Exp(Tuple([Exp(App(Exp(Var("div2")), Exp(Var("npp"))))])))))])))]))))),
+            ),
+        ),
+        ExpDecl(
+            "inc",
+            Exp(
+                Func(Param { name: "n", ty: Type(Named("nat")) }, Exp(CTor("S", Exp(Var("n"))))),
+            ),
+        ),
+    ],
+    synth_type: Type(
+        Arrow(Type(Arrow(Type(Arrow(Type(Named("nat")), Type(Named("nat")))), Type(Named("tree")))), Type(Named("tree"))),
+    ),
+    spec: UIOEs(
+        [
+            Example {
+                input: [
+                    Exp(
+                        Var("div2"),
+                    ),
+                    Exp(
+                        CTor("Leaf", Exp(Tuple([]))),
+                    ),
+                ],
+                output: Exp(
+                    CTor("Leaf", Exp(Tuple([]))),
+                ),
+            },
+            Example {
+                input: [
+                    Exp(
+                        Var("div2"),
+                    ),
+                    Exp(
+                        CTor("Node", Exp(Tuple([Exp(CTor("Node", Exp(Tuple([Exp(CTor("Leaf", Exp(Tuple([])))), Exp(CTor("S", Exp(CTor("S", Exp(CTor("O", Exp(Tuple([])))))))), Exp(CTor("Leaf", Exp(Tuple([]))))])))), Exp(CTor("S", Exp(CTor("S", Exp(CTor("O", Exp(Tuple([])))))))), Exp(CTor("Leaf", Exp(Tuple([]))))]))),
+                    ),
+                ],
+                output: Exp(
+                    CTor("Node", Exp(Tuple([Exp(CTor("Node", Exp(Tuple([Exp(CTor("Leaf", Exp(Tuple([])))), Exp(CTor("S", Exp(CTor("O", Exp(Tuple([])))))), Exp(CTor("Leaf", Exp(Tuple([]))))])))), Exp(CTor("S", Exp(CTor("O", Exp(Tuple([])))))), Exp(CTor("Leaf", Exp(Tuple([]))))]))),
+                ),
+            },
+            Example {
+                input: [
+                    Exp(
+                        Var("div2"),
+                    ),
+                    Exp(
+                        CTor("Node", Exp(Tuple([Exp(CTor("Leaf", Exp(Tuple([])))), Exp(CTor("S", Exp(CTor("O", Exp(Tuple([])))))), Exp(CTor("Node", Exp(Tuple([Exp(CTor("Leaf", Exp(Tuple([])))), Exp(CTor("S", Exp(CTor("S", Exp(CTor("O", Exp(Tuple([])))))))), Exp(CTor("Leaf", Exp(Tuple([]))))]))))]))),
+                    ),
+                ],
+                output: Exp(
+                    CTor("Node", Exp(Tuple([Exp(CTor("Leaf", Exp(Tuple([])))), Exp(CTor("O", Exp(Tuple([])))), Exp(CTor("Node", Exp(Tuple([Exp(CTor("Leaf", Exp(Tuple([])))), Exp(CTor("S", Exp(CTor("O", Exp(Tuple([])))))), Exp(CTor("Leaf", Exp(Tuple([]))))]))))]))),
+                ),
+            },
+            Example {
+                input: [
+                    Exp(
+                        Var("inc"),
+                    ),
+                    Exp(
+                        CTor("Node", Exp(Tuple([Exp(CTor("Leaf", Exp(Tuple([])))), Exp(CTor("O", Exp(Tuple([])))), Exp(CTor("Leaf", Exp(Tuple([]))))]))),
+                    ),
+                ],
+                output: Exp(
+                    CTor("Node", Exp(Tuple([Exp(CTor("Leaf", Exp(Tuple([])))), Exp(CTor("S", Exp(CTor("O", Exp(Tuple([])))))), Exp(CTor("Leaf", Exp(Tuple([]))))]))),
+                ),
+            },
+        ],
+    ),
+}

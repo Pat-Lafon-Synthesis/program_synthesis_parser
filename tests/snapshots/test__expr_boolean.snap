@@ -1,0 +1,186 @@
+---
+source: tests/test.rs
+expression: parser.parse(&buffer).unwrap()
+---
+SynthProblem {
+    imports: [],
+    decls: [
+        TypeDecl(
+            "bool",
+            Type(
+                Variant([("True", Type(Tuple([]))), ("False", Type(Tuple([])))]),
+            ),
+        ),
+        TypeDecl(
+            "formula",
+            Type(
+                Variant([("BOOL", Type(Named("bool"))), ("NOT", Type(Named("formula"))), ("ANDALSO", Type(Tuple([Type(Named("formula")), Type(Named("formula"))]))), ("ORELSE", Type(Tuple([Type(Named("formula")), Type(Named("formula"))]))), ("IMPLY", Type(Tuple([Type(Named("formula")), Type(Named("formula"))])))]),
+            ),
+        ),
+        ExpDecl(
+            "bnot",
+            Exp(
+                Fix("bnot", Type(Arrow(Type(Named("bool")), Type(Named("bool")))), Exp(Func(Param { name: "x", ty: Type(Named("bool")) }, Exp(Match(Exp(Var("x")), [(Ctor("False", Wildcard), Exp(CTor("True", Exp(Tuple([]))))), (Ctor("True", Wildcard), Exp(CTor("False", Exp(Tuple([])))))]))))),
+            ),
+        ),
+        ExpDecl(
+            "band",
+            Exp(
+                Fix("band", Type(Arrow(Type(Arrow(Type(Named("bool")), Type(Named("bool")))), Type(Named("bool")))), Exp(Func(Param { name: "x", ty: Type(Named("bool")) }, Exp(Func(Param { name: "y", ty: Type(Named("bool")) }, Exp(Match(Exp(Var("x")), [(Ctor("False", Wildcard), Exp(Var("x"))), (Ctor("True", Wildcard), Exp(Var("y")))]))))))),
+            ),
+        ),
+        ExpDecl(
+            "bor",
+            Exp(
+                Fix("bor", Type(Arrow(Type(Arrow(Type(Named("bool")), Type(Named("bool")))), Type(Named("bool")))), Exp(Func(Param { name: "x", ty: Type(Named("bool")) }, Exp(Func(Param { name: "y", ty: Type(Named("bool")) }, Exp(Match(Exp(Var("x")), [(Ctor("False", Wildcard), Exp(Var("y"))), (Ctor("True", Wildcard), Exp(Var("x")))]))))))),
+            ),
+        ),
+    ],
+    synth_type: Type(
+        Arrow(Type(Named("formula")), Type(Named("bool"))),
+    ),
+    spec: UIOEs(
+        [
+            Example {
+                input: [
+                    Exp(
+                        CTor("BOOL", Exp(Tuple([Exp(CTor("True", Exp(Tuple([]))))]))),
+                    ),
+                ],
+                output: Exp(
+                    CTor("True", Exp(Tuple([]))),
+                ),
+            },
+            Example {
+                input: [
+                    Exp(
+                        CTor("BOOL", Exp(Tuple([Exp(CTor("False", Exp(Tuple([]))))]))),
+                    ),
+                ],
+                output: Exp(
+                    CTor("False", Exp(Tuple([]))),
+                ),
+            },
+            Example {
+                input: [
+                    Exp(
+                        CTor("NOT", Exp(Tuple([Exp(CTor("BOOL", Exp(Tuple([Exp(CTor("True", Exp(Tuple([]))))]))))]))),
+                    ),
+                ],
+                output: Exp(
+                    CTor("False", Exp(Tuple([]))),
+                ),
+            },
+            Example {
+                input: [
+                    Exp(
+                        CTor("NOT", Exp(Tuple([Exp(CTor("BOOL", Exp(Tuple([Exp(CTor("False", Exp(Tuple([]))))]))))]))),
+                    ),
+                ],
+                output: Exp(
+                    CTor("True", Exp(Tuple([]))),
+                ),
+            },
+            Example {
+                input: [
+                    Exp(
+                        CTor("ANDALSO", Exp(Tuple([Exp(CTor("BOOL", Exp(Tuple([Exp(CTor("True", Exp(Tuple([]))))])))), Exp(CTor("BOOL", Exp(Tuple([Exp(CTor("False", Exp(Tuple([]))))]))))]))),
+                    ),
+                ],
+                output: Exp(
+                    CTor("False", Exp(Tuple([]))),
+                ),
+            },
+            Example {
+                input: [
+                    Exp(
+                        CTor("ANDALSO", Exp(Tuple([Exp(CTor("BOOL", Exp(Tuple([Exp(CTor("True", Exp(Tuple([]))))])))), Exp(CTor("BOOL", Exp(Tuple([Exp(CTor("True", Exp(Tuple([]))))]))))]))),
+                    ),
+                ],
+                output: Exp(
+                    CTor("True", Exp(Tuple([]))),
+                ),
+            },
+            Example {
+                input: [
+                    Exp(
+                        CTor("ANDALSO", Exp(Tuple([Exp(CTor("BOOL", Exp(Tuple([Exp(CTor("False", Exp(Tuple([]))))])))), Exp(CTor("BOOL", Exp(Tuple([Exp(CTor("True", Exp(Tuple([]))))]))))]))),
+                    ),
+                ],
+                output: Exp(
+                    CTor("False", Exp(Tuple([]))),
+                ),
+            },
+            Example {
+                input: [
+                    Exp(
+                        CTor("ORELSE", Exp(Tuple([Exp(CTor("BOOL", Exp(Tuple([Exp(CTor("True", Exp(Tuple([]))))])))), Exp(CTor("BOOL", Exp(Tuple([Exp(CTor("False", Exp(Tuple([]))))]))))]))),
+                    ),
+                ],
+                output: Exp(
+                    CTor("True", Exp(Tuple([]))),
+                ),
+            },
+            Example {
+                input: [
+                    Exp(
+                        CTor("ORELSE", Exp(Tuple([Exp(CTor("BOOL", Exp(Tuple([Exp(CTor("False", Exp(Tuple([]))))])))), Exp(CTor("BOOL", Exp(Tuple([Exp(CTor("False", Exp(Tuple([]))))]))))]))),
+                    ),
+                ],
+                output: Exp(
+                    CTor("False", Exp(Tuple([]))),
+                ),
+            },
+            Example {
+                input: [
+                    Exp(
+                        CTor("ORELSE", Exp(Tuple([Exp(CTor("BOOL", Exp(Tuple([Exp(CTor("False", Exp(Tuple([]))))])))), Exp(CTor("BOOL", Exp(Tuple([Exp(CTor("True", Exp(Tuple([]))))]))))]))),
+                    ),
+                ],
+                output: Exp(
+                    CTor("True", Exp(Tuple([]))),
+                ),
+            },
+            Example {
+                input: [
+                    Exp(
+                        CTor("IMPLY", Exp(Tuple([Exp(CTor("BOOL", Exp(Tuple([Exp(CTor("True", Exp(Tuple([]))))])))), Exp(CTor("BOOL", Exp(Tuple([Exp(CTor("False", Exp(Tuple([]))))]))))]))),
+                    ),
+                ],
+                output: Exp(
+                    CTor("False", Exp(Tuple([]))),
+                ),
+            },
+            Example {
+                input: [
+                    Exp(
+                        CTor("IMPLY", Exp(Tuple([Exp(CTor("BOOL", Exp(Tuple([Exp(CTor("False", Exp(Tuple([]))))])))), Exp(CTor("BOOL", Exp(Tuple([Exp(CTor("False", Exp(Tuple([]))))]))))]))),
+                    ),
+                ],
+                output: Exp(
+                    CTor("True", Exp(Tuple([]))),
+                ),
+            },
+            Example {
+                input: [
+                    Exp(
+                        CTor("IMPLY", Exp(Tuple([Exp(CTor("BOOL", Exp(Tuple([Exp(CTor("False", Exp(Tuple([]))))])))), Exp(CTor("BOOL", Exp(Tuple([Exp(CTor("True", Exp(Tuple([]))))]))))]))),
+                    ),
+                ],
+                output: Exp(
+                    CTor("True", Exp(Tuple([]))),
+                ),
+            },
+            Example {
+                input: [
+                    Exp(
+                        CTor("IMPLY", Exp(Tuple([Exp(CTor("BOOL", Exp(Tuple([Exp(CTor("True", Exp(Tuple([]))))])))), Exp(CTor("BOOL", Exp(Tuple([Exp(CTor("True", Exp(Tuple([]))))]))))]))),
+                    ),
+                ],
+                output: Exp(
+                    CTor("True", Exp(Tuple([]))),
+                ),
+            },
+        ],
+    ),
+}

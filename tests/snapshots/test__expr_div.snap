@@ -1,0 +1,144 @@
+---
+source: tests/test.rs
+expression: parser.parse(&buffer).unwrap()
+---
+SynthProblem {
+    imports: [],
+    decls: [
+        TypeDecl(
+            "nat",
+            Type(
+                Variant([("O", Type(Tuple([]))), ("S", Type(Named("nat")))]),
+            ),
+        ),
+        TypeDecl(
+            "exp",
+            Type(
+                Variant([("INT", Type(Named("nat"))), ("ADD", Type(Tuple([Type(Named("exp")), Type(Named("exp"))]))), ("SUB", Type(Tuple([Type(Named("exp")), Type(Named("exp"))]))), ("MUL", Type(Tuple([Type(Named("exp")), Type(Named("exp"))]))), ("DIV", Type(Tuple([Type(Named("exp")), Type(Named("exp"))])))]),
+            ),
+        ),
+        TypeDecl(
+            "cmp",
+            Type(
+                Variant([("LT", Type(Tuple([]))), ("EQ", Type(Tuple([]))), ("GT", Type(Tuple([])))]),
+            ),
+        ),
+        ExpDecl(
+            "compare",
+            Exp(
+                Fix("compare", Type(Arrow(Type(Arrow(Type(Named("nat")), Type(Named("nat")))), Type(Named("cmp")))), Exp(Func(Param { name: "x1", ty: Type(Named("nat")) }, Exp(Func(Param { name: "x2", ty: Type(Named("nat")) }, Exp(Match(Exp(Var("x1")), [(Ctor("O", Wildcard), Exp(Match(Exp(Var("x2")), [(Ctor("O", Wildcard), Exp(CTor("EQ", Exp(Tuple([]))))), (Ctor("S", Wildcard), Exp(CTor("LT", Exp(Tuple([])))))]))), (Ctor("S", Var("x1p")), Exp(Match(Exp(Var("x2")), [(Ctor("O", Wildcard), Exp(CTor("GT", Exp(Tuple([]))))), (Ctor("S", Var("x2p")), Exp(App(Exp(App(Exp(Var("compare")), Exp(Var("x1p")))), Exp(Var("x2p")))))])))]))))))),
+            ),
+        ),
+        ExpDecl(
+            "add",
+            Exp(
+                Fix("add", Type(Arrow(Type(Arrow(Type(Named("nat")), Type(Named("nat")))), Type(Named("nat")))), Exp(Func(Param { name: "n1", ty: Type(Named("nat")) }, Exp(Func(Param { name: "n2", ty: Type(Named("nat")) }, Exp(Match(Exp(Var("n1")), [(Ctor("O", Wildcard), Exp(Var("n2"))), (Ctor("S", Var("n1p")), Exp(CTor("S", Exp(Tuple([Exp(App(Exp(App(Exp(Var("add")), Exp(Var("n1p")))), Exp(Var("n2"))))])))))]))))))),
+            ),
+        ),
+        ExpDecl(
+            "sub",
+            Exp(
+                Fix("sub", Type(Arrow(Type(Arrow(Type(Named("nat")), Type(Named("nat")))), Type(Named("nat")))), Exp(Func(Param { name: "n1", ty: Type(Named("nat")) }, Exp(Func(Param { name: "n2", ty: Type(Named("nat")) }, Exp(Match(Exp(Var("n1")), [(Ctor("O", Wildcard), Exp(CTor("O", Exp(Tuple([]))))), (Ctor("S", Var("n1p")), Exp(Match(Exp(Var("n2")), [(Ctor("O", Wildcard), Exp(Var("n1"))), (Ctor("S", Var("n2p")), Exp(App(Exp(App(Exp(Var("sub")), Exp(Var("n1p")))), Exp(Var("n2p")))))])))]))))))),
+            ),
+        ),
+        ExpDecl(
+            "mul",
+            Exp(
+                Fix("mul", Type(Arrow(Type(Arrow(Type(Named("nat")), Type(Named("nat")))), Type(Named("nat")))), Exp(Func(Param { name: "n1", ty: Type(Named("nat")) }, Exp(Func(Param { name: "n2", ty: Type(Named("nat")) }, Exp(Match(Exp(Var("n1")), [(Ctor("O", Wildcard), Exp(CTor("O", Exp(Tuple([]))))), (Ctor("S", Var("n1p")), Exp(App(Exp(App(Exp(Var("add")), Exp(Var("n2")))), Exp(App(Exp(App(Exp(Var("mul")), Exp(Var("n1p")))), Exp(Var("n2")))))))]))))))),
+            ),
+        ),
+        ExpDecl(
+            "div",
+            Exp(
+                Fix("div", Type(Arrow(Type(Arrow(Type(Named("nat")), Type(Named("nat")))), Type(Named("nat")))), Exp(Func(Param { name: "n1", ty: Type(Named("nat")) }, Exp(Func(Param { name: "n2", ty: Type(Named("nat")) }, Exp(Match(Exp(Var("n2")), [(Ctor("O", Wildcard), Exp(CTor("O", Exp(Tuple([]))))), (Ctor("S", Var("n2p")), Exp(Match(Exp(Var("n1")), [(Ctor("O", Wildcard), Exp(CTor("O", Exp(Tuple([]))))), (Ctor("S", Var("n1p")), Exp(Match(Exp(App(Exp(App(Exp(Var("compare")), Exp(Var("n1")))), Exp(Var("n2")))), [(Ctor("LT", Wildcard), Exp(CTor("O", Exp(Tuple([]))))), (Ctor("EQ", Wildcard), Exp(CTor("S", Exp(Tuple([Exp(CTor("O", Exp(Tuple([]))))]))))), (Ctor("GT", Wildcard), Exp(CTor("S", Exp(Tuple([Exp(App(Exp(App(Exp(Var("div")), Exp(App(Exp(App(Exp(Var("sub")), Exp(Var("n1")))), Exp(Var("n2")))))), Exp(Var("n2"))))])))))])))])))]))))))),
+            ),
+        ),
+    ],
+    synth_type: Type(
+        Arrow(Type(Named("exp")), Type(Named("nat"))),
+    ),
+    spec: UIOEs(
+        [
+            Example {
+                input: [
+                    Exp(
+                        CTor("INT", Exp(Tuple([Exp(CTor("S", Exp(CTor("O", Exp(Tuple([]))))))]))),
+                    ),
+                ],
+                output: Exp(
+                    CTor("S", Exp(CTor("O", Exp(Tuple([]))))),
+                ),
+            },
+            Example {
+                input: [
+                    Exp(
+                        CTor("ADD", Exp(Tuple([Exp(CTor("INT", Exp(Tuple([Exp(CTor("S", Exp(CTor("S", Exp(CTor("S", Exp(CTor("O", Exp(Tuple([]))))))))))])))), Exp(CTor("INT", Exp(Tuple([Exp(CTor("S", Exp(CTor("S", Exp(CTor("S", Exp(CTor("S", Exp(CTor("O", Exp(Tuple([]))))))))))))]))))]))),
+                    ),
+                ],
+                output: Exp(
+                    CTor("S", Exp(CTor("S", Exp(CTor("S", Exp(CTor("S", Exp(CTor("S", Exp(CTor("S", Exp(CTor("S", Exp(CTor("O", Exp(Tuple([]))))))))))))))))),
+                ),
+            },
+            Example {
+                input: [
+                    Exp(
+                        CTor("MUL", Exp(Tuple([Exp(CTor("INT", Exp(Tuple([Exp(CTor("S", Exp(CTor("S", Exp(CTor("S", Exp(CTor("O", Exp(Tuple([]))))))))))])))), Exp(CTor("INT", Exp(Tuple([Exp(CTor("S", Exp(CTor("S", Exp(CTor("S", Exp(CTor("O", Exp(Tuple([]))))))))))]))))]))),
+                    ),
+                ],
+                output: Exp(
+                    CTor("S", Exp(CTor("S", Exp(CTor("S", Exp(CTor("S", Exp(CTor("S", Exp(CTor("S", Exp(CTor("S", Exp(CTor("S", Exp(CTor("S", Exp(CTor("O", Exp(Tuple([]))))))))))))))))))))),
+                ),
+            },
+            Example {
+                input: [
+                    Exp(
+                        CTor("MUL", Exp(Tuple([Exp(CTor("INT", Exp(Tuple([Exp(CTor("S", Exp(CTor("S", Exp(CTor("O", Exp(Tuple([]))))))))])))), Exp(CTor("INT", Exp(Tuple([Exp(CTor("S", Exp(CTor("S", Exp(CTor("S", Exp(CTor("O", Exp(Tuple([]))))))))))]))))]))),
+                    ),
+                ],
+                output: Exp(
+                    CTor("S", Exp(CTor("S", Exp(CTor("S", Exp(CTor("S", Exp(CTor("S", Exp(CTor("S", Exp(CTor("O", Exp(Tuple([]))))))))))))))),
+                ),
+            },
+            Example {
+                input: [
+                    Exp(
+                        CTor("SUB", Exp(Tuple([Exp(CTor("INT", Exp(Tuple([Exp(CTor("S", Exp(CTor("S", Exp(CTor("S", Exp(CTor("S", Exp(CTor("O", Exp(Tuple([]))))))))))))])))), Exp(CTor("INT", Exp(Tuple([Exp(CTor("S", Exp(CTor("S", Exp(CTor("S", Exp(CTor("O", Exp(Tuple([]))))))))))]))))]))),
+                    ),
+                ],
+                output: Exp(
+                    CTor("S", Exp(CTor("O", Exp(Tuple([]))))),
+                ),
+            },
+            Example {
+                input: [
+                    Exp(
+                        CTor("SUB", Exp(Tuple([Exp(CTor("INT", Exp(Tuple([Exp(CTor("S", Exp(CTor("S", Exp(CTor("S", Exp(CTor("S", Exp(CTor("S", Exp(CTor("O", Exp(Tuple([]))))))))))))))])))), Exp(CTor("INT", Exp(Tuple([Exp(CTor("S", Exp(CTor("O", Exp(Tuple([]))))))]))))]))),
+                    ),
+                ],
+                output: Exp(
+                    CTor("S", Exp(CTor("S", Exp(CTor("S", Exp(CTor("S", Exp(CTor("O", Exp(Tuple([]))))))))))),
+                ),
+            },
+            Example {
+                input: [
+                    Exp(
+                        CTor("DIV", Exp(Tuple([Exp(CTor("INT", Exp(Tuple([Exp(CTor("S", Exp(CTor("S", Exp(CTor("S", Exp(CTor("S", Exp(CTor("O", Exp(Tuple([]))))))))))))])))), Exp(CTor("INT", Exp(Tuple([Exp(CTor("S", Exp(CTor("S", Exp(CTor("O", Exp(Tuple([]))))))))]))))]))),
+                    ),
+                ],
+                output: Exp(
+                    CTor("S", Exp(CTor("S", Exp(CTor("O", Exp(Tuple([]))))))),
+                ),
+            },
+            Example {
+                input: [
+                    Exp(
+                        CTor("DIV", Exp(Tuple([Exp(CTor("INT", Exp(Tuple([Exp(CTor("S", Exp(CTor("S", Exp(CTor("S", Exp(CTor("S", Exp(CTor("S", Exp(CTor("O", Exp(Tuple([]))))))))))))))])))), Exp(CTor("INT", Exp(Tuple([Exp(CTor("S", Exp(CTor("S", Exp(CTor("S", Exp(CTor("O", Exp(Tuple([]))))))))))]))))]))),
+                    ),
+                ],
+                output: Exp(
+                    CTor("S", Exp(CTor("O", Exp(Tuple([]))))),
+                ),
+            },
+        ],
+    ),
+}

@@ -1,0 +1,126 @@
+---
+source: tests/test.rs
+expression: parser.parse(&buffer).unwrap()
+---
+SynthProblem {
+    imports: [],
+    decls: [
+        TypeDecl(
+            "nat",
+            Type(
+                Variant([("O", Type(Tuple([]))), ("S", Type(Named("nat")))]),
+            ),
+        ),
+    ],
+    synth_type: Type(
+        Arrow(Type(Arrow(Type(Named("nat")), Type(Named("nat")))), Type(Named("nat"))),
+    ),
+    spec: UIOEs(
+        [
+            Example {
+                input: [
+                    Exp(
+                        CTor("O", Exp(Tuple([]))),
+                    ),
+                    Exp(
+                        CTor("O", Exp(Tuple([]))),
+                    ),
+                ],
+                output: Exp(
+                    CTor("O", Exp(Tuple([]))),
+                ),
+            },
+            Example {
+                input: [
+                    Exp(
+                        CTor("O", Exp(Tuple([]))),
+                    ),
+                    Exp(
+                        CTor("S", Exp(CTor("O", Exp(Tuple([]))))),
+                    ),
+                ],
+                output: Exp(
+                    CTor("S", Exp(CTor("O", Exp(Tuple([]))))),
+                ),
+            },
+            Example {
+                input: [
+                    Exp(
+                        CTor("S", Exp(CTor("O", Exp(Tuple([]))))),
+                    ),
+                    Exp(
+                        CTor("O", Exp(Tuple([]))),
+                    ),
+                ],
+                output: Exp(
+                    CTor("S", Exp(CTor("O", Exp(Tuple([]))))),
+                ),
+            },
+            Example {
+                input: [
+                    Exp(
+                        CTor("S", Exp(CTor("O", Exp(Tuple([]))))),
+                    ),
+                    Exp(
+                        CTor("S", Exp(CTor("O", Exp(Tuple([]))))),
+                    ),
+                ],
+                output: Exp(
+                    CTor("S", Exp(CTor("S", Exp(CTor("O", Exp(Tuple([]))))))),
+                ),
+            },
+            Example {
+                input: [
+                    Exp(
+                        CTor("O", Exp(Tuple([]))),
+                    ),
+                    Exp(
+                        CTor("S", Exp(CTor("S", Exp(CTor("O", Exp(Tuple([]))))))),
+                    ),
+                ],
+                output: Exp(
+                    CTor("S", Exp(CTor("S", Exp(CTor("O", Exp(Tuple([]))))))),
+                ),
+            },
+            Example {
+                input: [
+                    Exp(
+                        CTor("S", Exp(CTor("S", Exp(CTor("O", Exp(Tuple([]))))))),
+                    ),
+                    Exp(
+                        CTor("O", Exp(Tuple([]))),
+                    ),
+                ],
+                output: Exp(
+                    CTor("S", Exp(CTor("S", Exp(CTor("O", Exp(Tuple([]))))))),
+                ),
+            },
+            Example {
+                input: [
+                    Exp(
+                        CTor("S", Exp(CTor("O", Exp(Tuple([]))))),
+                    ),
+                    Exp(
+                        CTor("S", Exp(CTor("S", Exp(CTor("O", Exp(Tuple([]))))))),
+                    ),
+                ],
+                output: Exp(
+                    CTor("S", Exp(CTor("S", Exp(CTor("S", Exp(CTor("O", Exp(Tuple([]))))))))),
+                ),
+            },
+            Example {
+                input: [
+                    Exp(
+                        CTor("S", Exp(CTor("S", Exp(CTor("O", Exp(Tuple([]))))))),
+                    ),
+                    Exp(
+                        CTor("S", Exp(CTor("O", Exp(Tuple([]))))),
+                    ),
+                ],
+                output: Exp(
+                    CTor("S", Exp(CTor("S", Exp(CTor("S", Exp(CTor("O", Exp(Tuple([]))))))))),
+                ),
+            },
+        ],
+    ),
+}

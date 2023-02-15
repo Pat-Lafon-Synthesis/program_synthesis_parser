@@ -1,0 +1,111 @@
+---
+source: tests/test.rs
+expression: parser.parse(&buffer).unwrap()
+---
+SynthProblem {
+    imports: [],
+    decls: [
+        TypeDecl(
+            "nat",
+            Type(
+                Variant([("O", Type(Tuple([]))), ("S", Type(Named("nat")))]),
+            ),
+        ),
+        TypeDecl(
+            "list",
+            Type(
+                Variant([("Nil", Type(Tuple([]))), ("Cons", Type(Tuple([Type(Named("nat")), Type(Named("list"))])))]),
+            ),
+        ),
+        TypeDecl(
+            "bool",
+            Type(
+                Variant([("True", Type(Tuple([]))), ("False", Type(Tuple([])))]),
+            ),
+        ),
+        ExpDecl(
+            "is_even",
+            Exp(
+                Fix("is_even", Type(Arrow(Type(Named("nat")), Type(Named("bool")))), Exp(Func(Param { name: "x1", ty: Type(Named("nat")) }, Exp(Match(Exp(Var("x1")), [(Ctor("O", Wildcard), Exp(CTor("True", Exp(Tuple([]))))), (Ctor("S", Var("x1p")), Exp(Match(Exp(Var("x1p")), [(Ctor("O", Wildcard), Exp(CTor("False", Exp(Tuple([]))))), (Ctor("S", Var("x1pp")), Exp(App(Exp(Var("is_even")), Exp(Var("x1pp")))))])))]))))),
+            ),
+        ),
+        ExpDecl(
+            "is_nonzero",
+            Exp(
+                Func(Param { name: "x1", ty: Type(Named("nat")) }, Exp(Match(Exp(Var("x1")), [(Ctor("O", Wildcard), Exp(CTor("False", Exp(Tuple([]))))), (Ctor("S", Wildcard), Exp(CTor("True", Exp(Tuple([])))))]))),
+            ),
+        ),
+    ],
+    synth_type: Type(
+        Arrow(Type(Arrow(Type(Arrow(Type(Named("nat")), Type(Named("bool")))), Type(Named("list")))), Type(Named("list"))),
+    ),
+    spec: UIOEs(
+        [
+            Example {
+                input: [
+                    Exp(
+                        Var("is_even"),
+                    ),
+                    Exp(
+                        CTor("Nil", Exp(Tuple([]))),
+                    ),
+                ],
+                output: Exp(
+                    CTor("Nil", Exp(Tuple([]))),
+                ),
+            },
+            Example {
+                input: [
+                    Exp(
+                        Var("is_even"),
+                    ),
+                    Exp(
+                        CTor("Cons", Exp(Tuple([Exp(CTor("S", Exp(CTor("S", Exp(CTor("O", Exp(Tuple([])))))))), Exp(CTor("Nil", Exp(Tuple([]))))]))),
+                    ),
+                ],
+                output: Exp(
+                    CTor("Cons", Exp(Tuple([Exp(CTor("S", Exp(CTor("S", Exp(CTor("O", Exp(Tuple([])))))))), Exp(CTor("Nil", Exp(Tuple([]))))]))),
+                ),
+            },
+            Example {
+                input: [
+                    Exp(
+                        Var("is_even"),
+                    ),
+                    Exp(
+                        CTor("Cons", Exp(Tuple([Exp(CTor("O", Exp(Tuple([])))), Exp(CTor("Cons", Exp(Tuple([Exp(CTor("O", Exp(Tuple([])))), Exp(CTor("Nil", Exp(Tuple([]))))]))))]))),
+                    ),
+                ],
+                output: Exp(
+                    CTor("Cons", Exp(Tuple([Exp(CTor("O", Exp(Tuple([])))), Exp(CTor("Cons", Exp(Tuple([Exp(CTor("O", Exp(Tuple([])))), Exp(CTor("Nil", Exp(Tuple([]))))]))))]))),
+                ),
+            },
+            Example {
+                input: [
+                    Exp(
+                        Var("is_even"),
+                    ),
+                    Exp(
+                        CTor("Cons", Exp(Tuple([Exp(CTor("S", Exp(CTor("O", Exp(Tuple([])))))), Exp(CTor("Cons", Exp(Tuple([Exp(CTor("O", Exp(Tuple([])))), Exp(CTor("Cons", Exp(Tuple([Exp(CTor("S", Exp(CTor("O", Exp(Tuple([])))))), Exp(CTor("Nil", Exp(Tuple([]))))]))))]))))]))),
+                    ),
+                ],
+                output: Exp(
+                    CTor("Cons", Exp(Tuple([Exp(CTor("O", Exp(Tuple([])))), Exp(CTor("Nil", Exp(Tuple([]))))]))),
+                ),
+            },
+            Example {
+                input: [
+                    Exp(
+                        Var("is_nonzero"),
+                    ),
+                    Exp(
+                        CTor("Cons", Exp(Tuple([Exp(CTor("O", Exp(Tuple([])))), Exp(CTor("Nil", Exp(Tuple([]))))]))),
+                    ),
+                ],
+                output: Exp(
+                    CTor("Nil", Exp(Tuple([]))),
+                ),
+            },
+        ],
+    ),
+}

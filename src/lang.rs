@@ -66,6 +66,15 @@ pub enum ActualType {
     Variant(Vec<(String, Type)>),
 }
 
+impl ActualType {
+    pub fn is_named(&self) -> bool {
+        match self {
+            Self::Named(_) => true,
+            _ => false,
+        }
+    }
+}
+
 #[derive(Debug)]
 pub enum Problem {
     UIOEs(Vec<Example>),

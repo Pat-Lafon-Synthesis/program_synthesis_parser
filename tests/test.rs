@@ -23,12 +23,10 @@ make_test!(bool_bor);
 make_test!(bool_impl);
 make_test!(bool_neg);
 
-
 make_test!(expr_boolean);
 make_test!(expr_div);
 make_test!(expr_sub);
 make_test!(expr);
-
 
 make_test!(list_append);
 make_test!(list_compress);
@@ -60,14 +58,12 @@ make_test!(list_sum);
 make_test!(list_take);
 make_test!(list_tl);
 
-
 make_test!(nat_add);
 make_test!(nat_iseven);
 make_test!(nat_max);
 make_test!(nat_mul);
 make_test!(nat_pred);
 make_test!(nat_sub);
-
 
 make_test!(tree_balanced);
 make_test!(tree_binsert);

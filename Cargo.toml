@@ -7,7 +7,7 @@ edition = "2021"
 
 [dependencies]
 cargo-insta = "1.26.0"
-hashconsing = {version = "1.5", path = "../hashconsing/hashconsing", features = ["derive"]}
+hashconsing = {version = "1.5", git = "https://github.com/Pat-Lafon/hashconsing.git", branch = "derive", features = ["derive"]}
 insta = "1.26.0"
 lalrpop-util = { version = "0.19", features = ["lexer"] }
 regex = "1"

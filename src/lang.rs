@@ -56,7 +56,7 @@ pub enum Declaration {
     ExpDecl(String, Exp),
 }
 
-#[hcons(name = "Type", impls = true)]
+#[hcons(name = "Type")]
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Clone)]
 pub enum ActualType {
     Named(String),
@@ -68,10 +68,7 @@ pub enum ActualType {
 
 impl ActualType {
     pub fn is_named(&self) -> bool {
-        match self {
-            Self::Named(_) => true,
-            _ => false,
-        }
+        matches!(self, Self::Named(_))
     }
 }
 
@@ -94,7 +91,7 @@ pub struct Param {
     pub ty: Type,
 }
 
-#[hcons(name = "Exp", impls = true)]
+#[hcons(name = "Exp")]
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone, Hash)]
 pub enum ActualExp {
     Var(String),
@@ -117,6 +114,7 @@ impl Exp {
             None => Self::CTor(c.to_string(), e),
         }
     }
+    #[allow(non_snake_case)]
     pub fn Unit() -> Self {
         Self::Tuple(Vec::new())
     }

@@ -6,9 +6,8 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-cargo-insta = "1.26.0"
 hashconsing = {version = "1.5", git = "https://github.com/Pat-Lafon/hashconsing.git", branch = "derive", features = ["derive"]}
-insta = "1.26.0"
+insta = "1.29"
 lalrpop-util = { version = "0.19", features = ["lexer"] }
 regex = "1"
 
@@ -16,4 +15,4 @@ regex = "1"
 lalrpop = "0.19"
 
 [dev-dependencies]
-insta = { version = "1.26.0", features = ["yaml"] }
+insta = { version = "1.29", features = ["yaml"] }

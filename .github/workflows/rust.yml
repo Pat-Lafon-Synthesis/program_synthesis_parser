@@ -27,8 +27,10 @@ jobs:
           ~/.cargo/git/db/
           target/
         key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
-    - name: Install cargo-insta for tests
-      run: cargo install cargo-insta
+    - name: Install cargo-insta
+      uses: baptiste0928/cargo-install@v2
+      with:
+        crate: cargo-insta
     - name: Build
       run: cargo build --verbose
     - name: Run tests

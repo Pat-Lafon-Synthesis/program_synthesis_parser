@@ -6,3 +6,4 @@ target/
 **/*.rs.bk
 
 src/spec.rs
+.vscode/

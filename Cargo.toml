@@ -8,7 +8,7 @@ edition = "2021"
 [dependencies]
 hashconsing = {version = "1.5", git = "https://github.com/Pat-Lafon/hashconsing.git", branch = "derive", features = ["derive"]}
 insta = "1.30"
-lalrpop-util = { version = "0.19", features = ["lexer"] }
+lalrpop-util = { version = "0.20", features = ["lexer"] }
 regex = "1"
 
 [build-dependencies]

@@ -213,7 +213,7 @@ checksum = "8a9ee70c43aaf417c914396645a0fa852624801b24ebb7ae78fe8272889ac888"
 [[package]]
 name = "hashconsing"
 version = "1.5.1"
-source = "git+https://github.com/Pat-Lafon/hashconsing.git?branch=derive#0135156a5b5fbc29824345dca4bda344d44c3c8a"
+source = "git+https://github.com/Pat-Lafon/hashconsing.git?branch=derive#f28bf536249e0be3d69ccce33298c34e1f3558e7"
 dependencies = [
  "hashconsing-derive",
  "lazy_static",
@@ -222,7 +222,7 @@ dependencies = [
 [[package]]
 name = "hashconsing-derive"
 version = "0.1.0"
-source = "git+https://github.com/Pat-Lafon/hashconsing.git?branch=derive#0135156a5b5fbc29824345dca4bda344d44c3c8a"
+source = "git+https://github.com/Pat-Lafon/hashconsing.git?branch=derive#f28bf536249e0be3d69ccce33298c34e1f3558e7"
 dependencies = [
  "darling",
  "proc-macro-error",

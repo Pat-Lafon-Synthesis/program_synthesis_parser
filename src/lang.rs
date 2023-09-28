@@ -1,6 +1,6 @@
 use std::fmt::Display;
 
-use hashconsing::{consign, hcons, HConsed, HashConsign};
+use hashconsing::hcons;
 
 #[derive(Debug)]
 pub struct SynthProblem {

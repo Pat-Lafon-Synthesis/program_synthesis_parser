@@ -6,7 +6,9 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-hashconsing = {version = "1.5", git = "https://github.com/Pat-Lafon/hashconsing.git", branch = "derive", features = ["derive"]}
+hashconsing = { git = "https://github.com/Pat-Lafon/hashconsing.git", branch = "derive", features = [
+    "derive",
+] }
 insta = "1.31"
 lalrpop-util = { version = "0.20", features = ["lexer"] }
 regex = "1"

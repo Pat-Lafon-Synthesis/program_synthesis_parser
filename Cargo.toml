@@ -10,7 +10,7 @@ hashconsing = { git = "https://github.com/Pat-Lafon/hashconsing.git", branch = "
     "derive",
 ] }
 insta = "1.34"
-lalrpop-util = { version = "0.20", features = ["lexer"] }
+lalrpop-util = { version = "0.20", features = ["unicode", "lexer"] }
 regex = "1"
 
 [build-dependencies]
